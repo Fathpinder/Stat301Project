@@ -1,0 +1,30 @@
+---
+title: "FinalProject"
+output: html_document
+date: "2024-04-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#install.packages("car")
+install.packages("tidyverse")
+library(tidyverse)
+library(car)
+```
+
+
+```{r}
+data1<-Framingham_Data%>%
+  filter(period==1)%>%
+  filter(bmi!="")
+model<-lm(bmi~sex+prevstrk+sex*prevstrk,data=data1)
+Anova(model,type="II")
+data1%>%
+  group_by(sex,prevstrk)%>%
+  summarize(avgbmi=mean(bmi),sterr=sd(bmi)/sqrt(length(bmi)),tstar=qt(1-0.05/2,length(bmi)-1))%>%
+  ggplot(aes(x=sex,y=avgbmi,color=prevstrk))+geom_point()+geom_errorbar(aes(ymin=avgbmi-tstar*sterr,ymax=avgbmi+tstar*sterr))
+```
+
